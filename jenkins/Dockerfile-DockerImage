@@ -1,0 +1,35 @@
+# Start with a base image that includes Docker CLI
+FROM docker:latest
+
+# Install additional tools if needed
+RUN apk update && \
+    apk add --no-cache \
+    bash \
+    curl \
+    jq \
+    && rm -rf /var/cache/apk/*
+
+# Example: Set up Jenkins user with necessary permissions
+RUN addgroup -g 1000 jenkins && \
+    adduser -D -u 1000 -G jenkins jenkins && \
+    addgroup jenkins docker
+	
+RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && sudo dpkg -i packages-microsoft-prod.deb && sudo rm packages-microsoft-prod.deb # buildkit
+
+RUN sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0 # buildkit
+
+RUN sudo apt-get install ca-certificates libc6 libgcc-s1 libgssapi-krb5-2 libicu66 libssl1.1 libstdc++6 zlib1g # buildkit
+
+RUN sudo apt-get update # buildkit
+
+# Set Jenkins user
+USER jenkins
+
+# Example: Set Jenkins environment variables (adjust as needed)
+ENV HOME /home/jenkins
+
+# Example: Create a working directory
+WORKDIR $HOME
+
+# Example: Run Docker container with Docker CLI installed
+CMD ["docker", "--version"]

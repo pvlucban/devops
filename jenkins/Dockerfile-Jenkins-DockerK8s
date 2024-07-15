@@ -1,0 +1,18 @@
+FROM jenkins/jenkins:lts
+USER root
+
+RUN apt-get update -qq && apt-get install -qqy \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    lxc \
+    iptables
+    
+RUN curl -sSL https://get.docker.com/ | sh
+
+# install kubectl
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl; chmod +x ./kubectl; mv ./kubectl /usr/local/bin/kubectl
+
+RUN usermod -aG docker jenkins
+
+CMD update-alternatives --set iptables /usr/sbin/iptables-legacy && dockerd
